@@ -5,32 +5,32 @@ shared:
   seed: 42
 
 B1_tabular_mlp:
-  lr: 1e-3
+  lr: 0.001
   hidden_dims: [128, 256, 128]
   dropout: 0.3
 
 B2_text_bert:
-  lr: 2e-5
+  lr: 0.00002
   freeze_layers: 9
   hidden_dim: 256
   dropout: 0.5
 
 B3_ecg_resnet:
-  lr: 1e-3
+  lr: 0.001
   resnet_blocks: 8
   kernel_size: 15
   dropout: 0.5
 
 B4_early_fusion:
-  lr: 2e-5
+  lr: 0.00002
   bert_freeze_layers: 9
 
 B5_late_fusion:
-  lr: 2e-5
+  lr: 0.00002
   fusion_weights: learnable
 
 B6_crossattn_only:
-  lr: 2e-5
+  lr: 0.00002
   attention_heads: 8
 
 B7_xgboost:

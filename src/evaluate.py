@@ -157,7 +157,11 @@ def plot_confusion_matrix(
 ) -> None:
     """Plot a row-normalised confusion matrix and save to *save_path*."""
     cm = confusion_matrix(labels, predictions)
-    cm_normalized = cm.astype(float) / cm.sum(axis=1, keepdims=True)
+    row_sums = cm.sum(axis=1, keepdims=True)
+    cm_normalized = np.divide(
+        cm.astype(float), row_sums, out=np.zeros_like(cm, dtype=float),
+        where=(row_sums != 0),
+    )
 
     fig, ax = plt.subplots(figsize=(8, 6), tight_layout=True)
     sns.heatmap(
@@ -317,11 +321,9 @@ def main(config_path: str) -> None:
     multi_task = config["model"].get("auxiliary_tasks", False)
 
     if model_version == "v7":
-        model_class = MultiModalTriageModelOptimized
-        model_kwargs: dict[str, Any] = {"config": config}
+        model = MultiModalTriageModelOptimized(config)
     else:
-        model_class = MultiModalTriageModel
-        model_kwargs = {}
+        model = MultiModalTriageModel()
 
     checkpoint_dir = Path(
         config["output"].get("checkpoint_dir", "outputs/checkpoints/")
@@ -332,12 +334,12 @@ def main(config_path: str) -> None:
     if not best_ckpt.exists():
         best_ckpt = processed_dir / "best_model.pt"
 
-    model = load_model(
-        checkpoint_path=str(best_ckpt),
-        model_class=model_class,
-        model_kwargs=model_kwargs,
-        device=str(device),
-    )
+    checkpoint = torch.load(str(best_ckpt), map_location=device)
+    state_dict = checkpoint.get("model_state_dict", checkpoint)
+    model.load_state_dict(state_dict)
+    model.to(device)
+    model.eval()
+    logger.info("Loaded best checkpoint from %s", best_ckpt)
 
     # ---- evaluation -------------------------------------------------------
     results = evaluate_model(model, test_loader, str(device), multi_task=multi_task)

@@ -589,7 +589,7 @@ def main(config_path: str = "configs/config.yaml") -> None:
     model_version = model_cfg.get("version", "v6")
 
     if model_version == "v7":
-        model = MultiModalTriageModelOptimized(config)
+        model = MultiModalTriageModelOptimized()
     else:
         model = MultiModalTriageModel()
 

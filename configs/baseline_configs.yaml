@@ -1,0 +1,43 @@
+shared:
+  batch_size: 32
+  max_epochs: 100
+  early_stopping_patience: 15
+  seed: 42
+
+B1_tabular_mlp:
+  lr: 0.001
+  hidden_dims: [128, 256, 128]
+  dropout: 0.3
+
+B2_text_bert:
+  lr: 0.00002
+  freeze_layers: 9
+  hidden_dim: 256
+  dropout: 0.5
+
+B3_ecg_resnet:
+  lr: 0.001
+  resnet_blocks: 8
+  kernel_size: 15
+  dropout: 0.5
+
+B4_early_fusion:
+  lr: 0.00002
+  bert_freeze_layers: 9
+
+B5_late_fusion:
+  lr: 0.00002
+  fusion_weights: learnable
+
+B6_crossattn_only:
+  lr: 0.00002
+  attention_heads: 8
+
+B7_xgboost:
+  max_depth: 6
+  lr: 0.1
+  n_estimators: 200
+  subsample: 0.8
+  colsample_bytree: 0.8
+  tfidf_max_features: 500
+  ecg_feature_type: statistical

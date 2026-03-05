@@ -1,0 +1,55 @@
+data:
+  raw_csv: data/raw/triage_icu_subject_id_note.csv
+  raw_ecg: data/raw/ecg_merged.npy
+  processed_dir: data/processed/
+  target_classes: [1, 2, 3]
+
+model:
+  version: v7
+  bert_model: emilyalsentzer/Bio_ClinicalBERT
+  bert_freeze_layers: 9
+  ecg:
+    type: hybrid
+    resnet_blocks: 8
+    transformer_layers: 2
+    kernel_size: 15
+  tabular:
+    interaction_features: true
+    hidden_dims: [128, 128, 128]
+  fusion:
+    conditioned_attention: true
+    channel_wise_gmu: true
+    attention_heads: 8
+  auxiliary_tasks: true
+  auxiliary_weight: 0.1
+
+training:
+  batch_size: 32
+  learning_rate: 0.00002
+  weight_decay: 0.01
+  max_epochs: 100
+  early_stopping:
+    patience: 15
+    min_delta: 0.001
+  gradient_clip: 1.0
+  scheduler:
+    type: cosine_warm_restarts
+    T_0: 10
+    T_mult: 2
+
+loss:
+  type: focal
+  gamma: 2.0
+  alpha: 0.25
+
+evaluation:
+  metrics: [f1_macro, accuracy, auc_roc]
+
+output:
+  checkpoint_dir: outputs/checkpoints/
+  figures_dir: outputs/figures/
+  reports_dir: outputs/reports/
+  logs_dir: outputs/logs/
+
+reproducibility:
+  seed: 42
